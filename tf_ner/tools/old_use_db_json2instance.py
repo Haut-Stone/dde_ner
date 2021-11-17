@@ -1,3 +1,6 @@
+"""
+最初的老数据用
+"""
 import json
 
 json_data = json.load(open('old_data_save/第一次完整可靠可用的少量数据/db_instances.json', encoding='utf-8'))
