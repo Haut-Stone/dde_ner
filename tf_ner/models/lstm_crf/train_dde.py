@@ -140,7 +140,7 @@ def model_fn(features, labels, mode, params):
                 mode, loss=loss, train_op=train_op)
 
 
-if __name__ == '__main__':
+def run_model():
     # Params
     params = {
         'dim': 300,
@@ -195,3 +195,7 @@ if __name__ == '__main__':
 
     for name in ['train', 'testa']:
         write_predictions(name)
+
+
+if __name__ == '__main__':
+    run_model()

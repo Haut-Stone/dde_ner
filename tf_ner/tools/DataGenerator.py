@@ -9,8 +9,8 @@ import csv
 
 class DataGenerator:
 
-    def __init__(self):
-        self.conn = sqlite3.connect('C:\\Users\\sjh\\Desktop\\doccano\\doccano21@11@15.db')
+    def __init__(self, database):
+        self.conn = sqlite3.connect(database)
         self.ins_json = dict()
         self.rel_json = dict()
         self.rel_map = dict()
@@ -24,12 +24,14 @@ class DataGenerator:
         self.ins_set = set()
         self.ins_rows = []
         self.rel_rows = []
+        self.project_id = 0
 
     def get_sql_data(self, project_id):
         """
         获得一个项目中的所有数据,并以句子为单位组合，将属于一个句子的实体与关系全部整合到以句子为键的一个字典项中
         这里得到的是最原始的数据，系统里实体和关系填成什么样子这里就是什么样子
         """
+        self.project_id = project_id
         i = self.conn.cursor()
         r = self.conn.cursor()
         instances = i.execute(  # 获取该项目所有用户的实体标记列表
@@ -378,15 +380,17 @@ class DataGenerator:
         将数据写入到 txt 与 json 文件 (这个文件是在 neo4j 中检查时要用到的)
         """
         headers = ['实体类型', '实体', '句子', '起始单词位置', '结束单词位置', '句子 id', '项目 id', '项目名称', '标注用户名']
-        with open('./check_data/ins.csv', 'a', newline='', encoding='utf-8') as f:
+        with open('./check_data/all_ins.csv', 'a', newline='', encoding='utf-8') as f:
             f_csv = csv.DictWriter(f, headers)
-            f_csv.writeheader()
+            if self.project_id == 32:
+                f_csv.writeheader()
             f_csv.writerows(self.ins_rows)
         headers = ['关系名称', '实体 1', '实体 1 类型', '实体 2', '实体 2 类型', '句子', '实体 1 起始单词位置', '实体 1 结束单词位置', '实体 2 起始单词位置',
                    '实体 2 结束单词位置', '句子 id', '项目名称', '项目 id', '标注用户名']
-        with open('./check_data/rel.csv', 'a', newline='', encoding='utf-8') as f:
+        with open('./check_data/all_rel.csv', 'a', newline='', encoding='utf-8') as f:
             f_csv = csv.DictWriter(f, headers)
-            f_csv.writeheader()
+            if self.project_id == 32:
+                f_csv.writeheader()
             f_csv.writerows(self.rel_rows)
 
         ins_txt = open('./raw_data/words.txt', 'a', encoding='utf-8')
@@ -427,7 +431,7 @@ class DataGenerator:
                 check_use_data.append(relation2.copy())
                 rel_txt.write(str(relation))
                 rel_txt.write('\n')
-        with open('./check_data/relation.json', 'a', encoding='utf-8') as f:
+        with open('./check_data/neo4j_use_relation.json', 'a', encoding='utf-8') as f:
             json.dump(check_use_data, f)
             f.close()
         for values in self.new_ins_json.values():  # 写入实体与标签
@@ -447,7 +451,8 @@ class DataGenerator:
         headers = ['负责用户名', '错误原因', '句子']
         with open('./check_data/error.csv', 'a', encoding='utf-8', newline='') as f:
             f_csv = csv.DictWriter(f, headers)
-            f_csv.writeheader()
+            if self.project_id == 32:
+                f_csv.writeheader()
             f_csv.writerows(self.error)
 
     def link_check(self):

@@ -9,13 +9,13 @@ ws = wb['Sheet']
 ws1 = wb['分类准确率，召回率，f1值']
 data = [[0, 0, 0, 0] for _ in range(10)]
 red_fill = PatternFill("solid", fgColor="CCCCFF")  # 单元格填充颜色
-line_count = 32940
-
 
 lines = []
-
-for i in range(line_count):
-    line = res_file.readline().split()
+while True:
+    line = res_file.readline()
+    if not line:
+        break
+    line = line.split()
     lines.append(line)
     word_tags = line
     if len(word_tags) < 3:

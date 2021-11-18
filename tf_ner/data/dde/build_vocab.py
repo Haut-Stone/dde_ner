@@ -10,7 +10,8 @@ from pathlib import Path
 # the GloVe vocab with your dataset vocab, etc. You figure it out ;)
 MINCOUNT = 1
 
-if __name__ == '__main__':
+
+def build_vocab():
     # 1. Words
     # Get Counter of words on all the data, filter by min count, save
     def words(name):
@@ -59,3 +60,7 @@ if __name__ == '__main__':
         for t in sorted(list(vocab_tags)):
             f.write('{}\n'.format(t))
     print('- done. Found {} tags.'.format(len(vocab_tags)))
+
+
+if __name__ == '__main__':
+    build_vocab()
