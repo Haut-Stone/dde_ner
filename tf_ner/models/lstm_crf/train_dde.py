@@ -142,11 +142,11 @@ def model_fn(features, labels, mode, params):
 
 def run_model():
     # Params
-    params = {
+    params = {  # 这里的参数实际上要好好改一下，有的地方问题还是比较大的。
         'dim': 300,
         'dropout': 0.5,
         'num_oov_buckets': 1,
-        'epochs': 25,
+        'epochs': 25,  # 原始是25
         'batch_size': 20,
         'buffer': 15000,
         'lstm_size': 100,
