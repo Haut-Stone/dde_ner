@@ -24,19 +24,19 @@ if __name__ == '__main__':
                 28, 26, 11, 48, 33, 49, 29, 51, 15, 47,
                 27, 45, 41, 46, 44, 42, 43]
     # projects = [32, 30, 34, 31]
-    projects = [7, 8,
+    projects = [6, 7,
                 32, 30, 34, 31,
-                9, 17, 36, 24, 13, 16, 14,
-                20, 25, 21, 22, 39, 40, 12,
-                28, 26, 11, 48, 33, 49, 29, 51, 15, 47,
-                27, 45, 41, 46, 44, 42, 43]
+                9, 17, 35, 36, 24, 16,
+                20, 22, 39, 40,
+                51,
+                41, 42, 43]
     for project in projects:
         print(project)
-        a = DataGenerator('C:\\Users\\sjh\\Desktop\\doccano\\doccano21@11@15.db')
+        a = DataGenerator('C:\\Users\\sjh\\Desktop\\doccano\\doccano21@11@25.db')
         a.run(project)
 
     # 生成过后将所有的数据进行数据集划分
-    # DataDivider().divide_ins_data(5)  # 4:1划分
+    DataDivider().divide_ins_data(5)  # 4:1划分
 
     # 进行词向量的生成
     # build_vocab()

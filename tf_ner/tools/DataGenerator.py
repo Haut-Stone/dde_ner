@@ -382,14 +382,14 @@ class DataGenerator:
         headers = ['实体类型', '实体', '句子', '起始单词位置', '结束单词位置', '句子 id', '项目 id', '项目名称', '标注用户名']
         with open('./check_data/all_ins.csv', 'a', newline='', encoding='utf-8') as f:
             f_csv = csv.DictWriter(f, headers)
-            if self.project_id == 32:
+            if self.project_id == 6:
                 f_csv.writeheader()
             f_csv.writerows(self.ins_rows)
         headers = ['关系名称', '实体 1', '实体 1 类型', '实体 2', '实体 2 类型', '句子', '实体 1 起始单词位置', '实体 1 结束单词位置', '实体 2 起始单词位置',
                    '实体 2 结束单词位置', '句子 id', '项目名称', '项目 id', '标注用户名']
         with open('./check_data/all_rel.csv', 'a', newline='', encoding='utf-8') as f:
             f_csv = csv.DictWriter(f, headers)
-            if self.project_id == 32:
+            if self.project_id == 6:
                 f_csv.writeheader()
             f_csv.writerows(self.rel_rows)
 
@@ -451,7 +451,7 @@ class DataGenerator:
         headers = ['负责用户名', '错误原因', '句子']
         with open('./check_data/error.csv', 'a', encoding='utf-8', newline='') as f:
             f_csv = csv.DictWriter(f, headers)
-            if self.project_id == 32:
+            if self.project_id == 6:
                 f_csv.writeheader()
             f_csv.writerows(self.error)
 
