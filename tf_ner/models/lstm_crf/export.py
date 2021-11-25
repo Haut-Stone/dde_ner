@@ -1,12 +1,9 @@
-"""Export model as a saved_model"""
+"""导出模型到一个完整的格式"""
 
-__author__ = "Guillaume Genthial"
 
 from pathlib import Path
 import json
-
 import tensorflow as tf
-
 from main import model_fn
 
 DATADIR = '../../data/example'

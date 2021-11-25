@@ -1,6 +1,3 @@
-"""Interact with a model"""
-
-__author__ = "Guillaume Genthial"
 
 from pathlib import Path
 import functools
@@ -10,10 +7,11 @@ import tensorflow as tf
 from main import model_fn
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-LINE = 'Melting of the overlying mantle wedge is triggered by the infiltration of the slab-derived fluids'
+LINE = 'The E - trending Gangdese porphyry copper belt in southern Tibet is a classic example of porphyry mineralization in a continental collision zone .'
 DATADIR = '../../data/dde'
 PARAMS = './results_dde/params.json'
 MODELDIR = './results_dde/model'
+
 
 def pretty_print(line, preds):
     words = line.strip().split()

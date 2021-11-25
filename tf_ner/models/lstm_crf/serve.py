@@ -1,4 +1,4 @@
-"""Reload and serve a saved model"""
+"""使用保存好的模型进行预测"""
 
 __author__ = "Guillaume Genthial"
 
