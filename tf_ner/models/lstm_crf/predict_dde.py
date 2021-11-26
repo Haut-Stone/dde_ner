@@ -17,6 +17,8 @@ class ModelRunner:
         self.PARAMS = './results_dde/params.json'
         self.MODELDIR = './results_dde/model'
         self.data = []
+        self.all_ins_for_every_sen = dict()
+        self.rel_predict_data = []
 
     def get_val_data(self):
         with open('../../data/dde/val.txt', 'r', encoding='utf-8') as f:
@@ -55,13 +57,72 @@ class ModelRunner:
         wb.close()
 
         # 保存关系模型要用的数据
+        # todo 暂时通过全连接的方式去构造关系，
+        # 生成全部实体
+        for sen_data in self.data:
+            if sen_data['id'] not in self.all_ins_for_every_sen:
+                self.all_ins_for_every_sen[sen_data['id']] = []
+            pos_b = -1
+            pos_e = -1
+            for i in range(len(sen_data['labels'])):  # 查找所有的单词
+                label = bytes.decode(sen_data['labels'][i])
+                if label.split('-')[0] == 'S':
+                    pos_b = i
+                    pos_e = i+1
+                    node = {
+                        'name': ' '.join(sen_data['words'][pos_b:pos_e]),
+                        'pos': [pos_b, pos_e],
+                        'type': label.split('-')[-1],
+                        'token': sen_data['words']
+                    }
+                    self.all_ins_for_every_sen[sen_data['id']].append(node)
+                else:
+                    if label.split('-')[0] == 'B':
+                        pos_b = i
+                    if label.split('-')[0] == 'E':
+                        pos_e = i + 1
+                        node = {
+                            'name': ' '.join(sen_data['words'][pos_b:pos_e]),
+                            'pos': [pos_b, pos_e],
+                            'type': label.split('-')[-1],
+                            'token': sen_data['words']
+                        }
+                        self.all_ins_for_every_sen[sen_data['id']].append(node)
+            print(self.all_ins_for_every_sen[sen_data['id']])
 
-    def pretty_print(self, line, preds):
+        # 全连接
+        txt = open('../../tools/out_data/关系预测数据.txt', 'w', encoding='utf-8')
+        for key, values in self.all_ins_for_every_sen.items():
+            for i in range(len(values)):  # i 是头节点
+                for j in range(len(values)):  # j是尾节点
+                    if i == j:
+                        continue
+                    rel = {
+                        'token': values[i]['token'],
+                        'h': {
+                            'name': values[i]['name'],
+                            'pos': values[i]['pos'],
+                            'type': values[i]['type']
+                        },
+                        't': {
+                            'name': values[j]['name'],
+                            'pos': values[j]['pos'],
+                            'type': values[i]['type']
+                        },
+                        'relation': 'NA'
+                    }
+                    self.rel_predict_data.append(rel)
+                    txt.write(str(rel))
+                    txt.write('\n')
+        txt.close()
+
+    def pretty_print(self, line, preds, id_counter):
         words = line.strip().split()
         lengths = [max(len(w), len(p)) for w, p in zip(words, preds)]
         padded_words = [w + (l - len(w)) * ' ' for w, l in zip(words, lengths)]
         padded_preds = [p.decode() + (l - len(p)) * ' ' for p, l in zip(preds, lengths)]
         sen = {
+            'id': id_counter,
             'sen': line,
             'words': words,
             'labels': preds,
@@ -70,8 +131,8 @@ class ModelRunner:
         }
         # print(words, preds)
         self.data.append(sen)
-        # print('words: {}'.format(' '.join(padded_words)))
-        # print('preds: {}'.format(' '.join(padded_preds)))
+        print('words: {}'.format(' '.join(padded_words)))
+        print('preds: {}'.format(' '.join(padded_preds)))
 
     @staticmethod
     def predict_input_fn(line):
@@ -84,6 +145,7 @@ class ModelRunner:
         return (words, nwords), None
 
     def run(self):
+        id_counter = 0
         with Path(self.PARAMS).open() as f:
             params = json.load(f)
         params['words'] = str(Path(self.DATADIR, 'vocab.words.txt'))
@@ -95,7 +157,8 @@ class ModelRunner:
         for line in self.lines:
             predict_inpf = functools.partial(self.predict_input_fn, line)
             for pred in estimator.predict(predict_inpf):
-                self.pretty_print(line, pred['tags'])
+                self.pretty_print(line, pred['tags'], id_counter=id_counter)
+                id_counter += 1
                 break
         self.gen_answer()
 
