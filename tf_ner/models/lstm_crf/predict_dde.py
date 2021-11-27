@@ -19,6 +19,8 @@ class ModelRunner:
         self.rel_train_data = json.load(open('../../tools/check_data/neo4j_use_relation.json'))
         self.data = []
         self.all_ins_for_every_sen = dict()
+        self.entity_end_type_dict = dict()
+        self.entity_begin_type_dict = dict()
         self.ins_pair_list = []
         self.type_pair_list = []
         self.rel_predict_data = []
@@ -95,11 +97,19 @@ class ModelRunner:
 
         # 这里不是全连接，而是对于所有出现的（实体名对）（类型对）有没有出现过。
         # 首先先去针对原始训练数据构造组合
+        # todo 这里以后重点也是对两边的实体要进行一个大小写，单复数的归一化
         for item in self.rel_train_data:
-            name1 = item['h']['name']
-            name2 = item['t']['name']
+            name1 = item['h']['name'].strip().lower()  # 去除大小写
+            name2 = item['t']['name'].strip().lower()
             type1 = item['h']['type'].split('_')[-1]
             type2 = item['t']['type'].split('_')[-1]
+            if name1 not in self.entity_begin_type_dict:  # 确定结尾实体
+                self.entity_begin_type_dict[name1] = []
+            if name2 not in self.entity_end_type_dict:  # 确定开始实体
+                self.entity_end_type_dict[name2] = []
+
+            self.entity_begin_type_dict[name1].append(type2)
+            self.entity_end_type_dict[name2].append(type1)
             self.ins_pair_list.append((name1, name2))
             print((name1, name2))
             if (type1, type2) not in self.type_pair_list:
@@ -111,14 +121,24 @@ class ModelRunner:
         for key, values in self.all_ins_for_every_sen.items():
             for i in range(len(values)):  # i 是头节点
                 for j in range(len(values)):  # j是尾节点
-                    if (values[i]['name'], values[j]['name']) not in self.ins_pair_list:  # 不是存在的的实体名对不预测
-                        print(values[i]['name'] + '@', values[j]['name'])
-                        continue
-                        # if (values[i]['type'], values[j]['type']) not in self.type_pair_list:  # 不是存在的类型对不预测
-                        #     print('b')
-                        #     continue
+                    name1 = values[i]['name'].strip().lower()
+                    name2 = values[j]['name'].strip().lower()
+                    type1 = values[i]['type']
+                    type2 = values[j]['type']
 
                     if i == j:
+                        continue
+                    if (values[i]['name'], values[j]['name']) in self.ins_pair_list:
+                        pass
+                    elif name1 in self.entity_begin_type_dict:  # 如果有a节点
+                        temp = self.entity_begin_type_dict[name1]  # 那我看b的type是否符合条件
+                        if type2 not in temp:  # 不符合跳过b节点，符合那就生成
+                            continue
+                    elif name2 in self.entity_end_type_dict:  # 如果你b在
+                        temp = self.entity_end_type_dict[name2]
+                        if type1 not in temp:  # 如果我a不属于你要找的头结点的类型，那我就跳过
+                            continue
+                    else:  # ab都不在，那没有判断依据跳过
                         continue
                     print(values[i]['type'], values[j]['type'])
                     rel = {
