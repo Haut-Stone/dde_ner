@@ -16,8 +16,11 @@ class ModelRunner:
         self.DATADIR = '../../data/dde'
         self.PARAMS = './results_dde/params.json'
         self.MODELDIR = './results_dde/model'
+        self.rel_train_data = json.load(open('./check_data/neo4j_use_relation.json'))
         self.data = []
         self.all_ins_for_every_sen = dict()
+        self.ins_pair_list = []
+        self.type_pair_list = []
         self.rel_predict_data = []
 
     def get_val_data(self):
@@ -90,11 +93,25 @@ class ModelRunner:
                         self.all_ins_for_every_sen[sen_data['id']].append(node)
             print(self.all_ins_for_every_sen[sen_data['id']])
 
-        # 全连接
+        # 这里不是全连接，而是对于所有出现的（实体名对）（类型对）有没有出现过。
+        # 首先先去针对原始训练数据构造组合
+        for item in self.rel_train_data:
+            name1 = item['h']['name']
+            name2 = item['t']['name']
+            type1 = item['h']['type']
+            type2 = item['t']['type']
+            self.ins_pair_list.append((name1, name2))
+            if (type1, type2) not in self.type_pair_list:
+                self.type_pair_list.append((type1, type2))
+
         txt = open('../../tools/out_data/关系预测数据.txt', 'w', encoding='utf-8')
         for key, values in self.all_ins_for_every_sen.items():
             for i in range(len(values)):  # i 是头节点
                 for j in range(len(values)):  # j是尾节点
+                    if (values[i]['name'], values[j]['name']) not in self.ins_pair_list:  # 不是存在的的实体名对不预测
+                        continue
+                    if (values[i]['type'], values[j]['type']) not in self.type_pair_list:  # 不是存在的类型对不预测
+                        continue
                     if i == j:
                         continue
                     rel = {
@@ -107,7 +124,7 @@ class ModelRunner:
                         't': {
                             'name': values[j]['name'],
                             'pos': values[j]['pos'],
-                            'type': values[i]['type']
+                            'type': values[j]['type']
                         },
                         'relation': 'NA'
                     }
