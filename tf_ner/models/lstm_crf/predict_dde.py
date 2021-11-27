@@ -107,18 +107,20 @@ class ModelRunner:
                 print((type1, type2))
 
         txt = open('../../tools/out_data/关系预测数据.txt', 'w', encoding='utf-8')
+        print('===================================')
         for key, values in self.all_ins_for_every_sen.items():
             for i in range(len(values)):  # i 是头节点
                 for j in range(len(values)):  # j是尾节点
                     if (values[i]['name'], values[j]['name']) not in self.ins_pair_list:  # 不是存在的的实体名对不预测
-                        print('a')
-                        print(values[i]['type'], values[j]['type'])
-                        if (values[i]['type'], values[j]['type']) not in self.type_pair_list:  # 不是存在的类型对不预测
-                            print('b')
-                            continue
+                        print(values[i]['name'] + '@', values[j]['name'])
+                        continue
+                        # if (values[i]['type'], values[j]['type']) not in self.type_pair_list:  # 不是存在的类型对不预测
+                        #     print('b')
+                        #     continue
 
                     if i == j:
                         continue
+                    print(values[i]['type'], values[j]['type'])
                     rel = {
                         'token': values[i]['token'],
                         'h': {
