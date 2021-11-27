@@ -129,16 +129,20 @@ class ModelRunner:
                     if i == j:
                         continue
                     if (values[i]['name'], values[j]['name']) in self.ins_pair_list:
+                        print('a')
                         pass
                     elif name1 in self.entity_begin_type_dict:  # 如果有a节点
+                        print('b')
                         temp = self.entity_begin_type_dict[name1]  # 那我看b的type是否符合条件
                         if type2 not in temp:  # 不符合跳过b节点，符合那就生成
                             continue
                     elif name2 in self.entity_end_type_dict:  # 如果你b在
+                        print('c')
                         temp = self.entity_end_type_dict[name2]
                         if type1 not in temp:  # 如果我a不属于你要找的头结点的类型，那我就跳过
                             continue
                     else:  # ab都不在，那没有判断依据跳过
+                        print('d')
                         continue
                     print(values[i]['type'], values[j]['type'])
                     rel = {
