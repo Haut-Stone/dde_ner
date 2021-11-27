@@ -1,7 +1,6 @@
 # 一些大型数据文件
 tf_ner/tools/check_data/*.rar
 tf_ner/tools/check_data/*.csv
-tf_ner/tools/check_data/*.json
 tf_ner/tools/old_data_save/
 tf_ner/tools/out_data/*.xlsx
 tf_ner/tools/raw_data/glove.840B.300d.txt
