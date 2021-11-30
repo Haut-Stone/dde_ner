@@ -395,7 +395,7 @@ class DataGenerator:
 
         ins_txt = open('./raw_data/words.txt', 'a', encoding='utf-8')
         ins_lab_txt = open('./raw_data/tags.txt', 'a', encoding='utf-8')
-        rel_txt = open('./raw_data/relations.txt', 'a', encoding='utf-8')
+        rel_txt = open('./raw_data_send_to_nre/relations.txt', 'a', encoding='utf-8')
         check_use_data = []
         for values in self.new_rel_json.values():
             for value in values:
@@ -431,7 +431,7 @@ class DataGenerator:
                 check_use_data.append(relation2.copy())
                 rel_txt.write(str(relation))
                 rel_txt.write('\n')
-        with open('./check_data/neo4j_use_relation.json', 'a', encoding='utf-8') as f:
+        with open('./raw_data_send_to_nre/rel_marked_neo4j_can_use.json', 'a', encoding='utf-8') as f:
             json.dump(check_use_data, f)
             f.close()
         for values in self.new_ins_json.values():  # 写入实体与标签

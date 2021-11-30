@@ -16,7 +16,7 @@ class ModelRunner:
         self.DATADIR = '../../data/dde'
         self.PARAMS = './results_dde/params.json'
         self.MODELDIR = './results_dde/model'
-        self.rel_train_data = json.load(open('../../tools/check_data/neo4j_use_relation.json'))
+        self.rel_train_data = json.load(open('tf_ner/tools/raw_data_send_to_nre/rel_marked_neo4j_can_use.json'))
         self.data = []
         self.all_ins_for_every_sen = dict()
         self.entity_end_type_dict = dict()
@@ -36,7 +36,7 @@ class ModelRunner:
     def gen_answer(self):
 
         # 保存给地学院看的数据
-        out_path = '../../tools/out_data/answer.xlsx'
+        out_path = 'tf_ner/tools/out_data/ner_predict_result.xlsx'
         wb = xlsxwriter.Workbook(out_path)
         ws = wb.add_worksheet('sheet1')
         pink = wb.add_format({'bold': True, 'color': 'EA6140'})
@@ -116,7 +116,7 @@ class ModelRunner:
                 self.type_pair_list.append((type1, type2))
                 print((type1, type2))
 
-        txt = open('../../tools/out_data/关系预测数据.txt', 'w', encoding='utf-8')
+        txt = open('tf_ner/tools/raw_data_send_to_nre/rel_smart_ins_pair_no_rel.txt', 'w', encoding='utf-8')
         print('===================================')
         for key, values in self.all_ins_for_every_sen.items():
             for i in range(len(values)):  # i 是头节点

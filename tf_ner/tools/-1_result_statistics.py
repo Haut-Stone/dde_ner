@@ -146,4 +146,4 @@ for i in range(10):
         r = data[i][1] / (data[i][1] + data[i][3])
         ws1.cell(i+2, 4).value = 2*p*r / (p+r)
 
-wb.save('./out_data/res_excel.xlsx')
+wb.save('./out_data/ner_train_result.xlsx')
