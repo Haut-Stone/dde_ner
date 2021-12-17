@@ -36,6 +36,7 @@ class ModelRunner:
     def gen_answer(self):
 
         # 保存给地学院看的数据和可以二次利用的json数据
+        # todo 生成json这一部分还没有测试，下次记得测试
         out_path = '../../tools/out_data/ner_predict_result.xlsx'
         storage_json_path = '../../tools/out_data/ner_predict_result.json'
         storage_json = []
