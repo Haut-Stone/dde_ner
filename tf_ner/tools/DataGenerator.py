@@ -374,6 +374,37 @@ class DataGenerator:
                         self.new_rel_json[rel['example_id']] = []
                     self.new_rel_json[rel['example_id']].append(rel)
 
+        # 对于没有关系的实体对要添加负类 NA 代表两个实体之间无关系
+        for idx1, ins1 in enumerate(self.ins_json[example_id]):
+            for idx2, ins2 in enumerate(self.ins_json[example_id]):
+                if idx1 == idx2:  # 同样的节点不处理
+                    continue
+                if ins1['type'].split('_')[0] == 'Link' or ins2['type'].split('_')[0] == 'Link':  # 如果其中有聚合元素不处理
+                    continue
+                have_rel = False
+                for rel in self.rel_json[example_id]:  # 查找他俩之间是否有关系
+                    if ins1['pos_begin'] == rel['pos_begin_1'] and ins1['pos_end'] == rel['pos_end_1'] and ins2['pos_begin'] == rel['pos_begin_2'] and ins2['pos_end'] == rel['pos_end_2']:  # 如果他俩有关系
+                        have_rel = True
+                        break
+                if not have_rel:  # 如果他俩真没关系，那就要添加一个负类关系
+                    data = {
+                        'name': 'NA',
+                        'pos_begin_1': ins1['pos_begin'],
+                        'pos_end_1': ins1['pos_end'],
+                        'type_1': ins1['type'],
+                        'pos_begin_2': ins2['pos_begin'],
+                        'pos_end_2': ins2['pos_end'],
+                        'type_2': ins2['type'],
+                        'sen': ins1['sen'],
+                        'project_id': ins1['project_id'],
+                        'project_name': ins1['project_name'],
+                        'example_id': example_id
+                    }
+                    # print(data)
+                    if data['example_id'] not in self.new_rel_json:
+                        self.new_rel_json[data['example_id']] = []
+                    self.new_rel_json[data['example_id']].append(data)
+
     def write_out(self):
         """
         将实体与关系的检查数据写出到 csv，用来让地学院的人检查
@@ -515,7 +546,8 @@ class DataGenerator:
 
 
 if __name__ == '__main__':
-    projects = [32, 31, 30, 34]
+    # projects = [32, 31, 30, 34]
+    projects = [32]
     for project in projects:
-        a = DataGenerator()
+        a = DataGenerator('C:\\Users\\sjh\\Desktop\\doccano\\doccano21@12@04.db')
         a.run(project)  # 生成数据

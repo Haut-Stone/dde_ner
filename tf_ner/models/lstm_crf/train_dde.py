@@ -149,7 +149,7 @@ def run_model():
         'epochs': 25,  # 原始是25
         'batch_size': 20,
         'buffer': 15000,
-        'lstm_size': 100,
+        'lstm_size': 200,
         'words': str(Path(DATADIR, 'vocab.words.txt')),
         'chars': str(Path(DATADIR, 'vocab.chars.txt')),
         'tags': str(Path(DATADIR, 'vocab.tags.txt')),

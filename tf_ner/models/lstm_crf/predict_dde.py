@@ -16,7 +16,7 @@ class ModelRunner:
         self.DATADIR = '../../data/dde'
         self.PARAMS = './results_dde/params.json'
         self.MODELDIR = './results_dde/model'
-        self.rel_train_data = json.load(open('tf_ner/tools/raw_data_send_to_nre/rel_marked_neo4j_can_use.json'))
+        self.rel_train_data = json.load(open('../../tools/raw_data_send_to_nre/rel_marked_neo4j_can_use.json'))
         self.data = []
         self.all_ins_for_every_sen = dict()
         self.entity_end_type_dict = dict()
@@ -35,16 +35,22 @@ class ModelRunner:
 
     def gen_answer(self):
 
-        # 保存给地学院看的数据
-        out_path = 'tf_ner/tools/out_data/ner_predict_result.xlsx'
+        # 保存给地学院看的数据和可以二次利用的json数据
+        out_path = '../../tools/out_data/ner_predict_result.xlsx'
+        storage_json_path = '../../tools/out_data/ner_predict_result.json'
+        storage_json = []
         wb = xlsxwriter.Workbook(out_path)
         ws = wb.add_worksheet('sheet1')
         pink = wb.add_format({'bold': True, 'color': 'EA6140'})
-
         counter = 1
         out_ins_seq = []
         out_lab_seq = []
         for sen_data in self.data:
+            json_line = {
+                'words': sen_data['words'],
+                'labels': sen_data['labels']
+            }
+            storage_json.append(json_line)
             for i in range(len(sen_data['words'])):
                 if str(sen_data['labels'][i], 'utf-8') != 'O':
                     out_ins_seq.append(pink)
@@ -60,9 +66,9 @@ class ModelRunner:
             out_ins_seq.clear()
             out_lab_seq.clear()
         wb.close()
+        json.dump(storage_json, open(storage_json_path, 'w', encoding='utf-8'))
 
         # 保存关系模型要用的数据
-        # todo 暂时通过全连接的方式去构造关系，
         # 生成全部实体
         for sen_data in self.data:
             if sen_data['id'] not in self.all_ins_for_every_sen:
@@ -93,7 +99,7 @@ class ModelRunner:
                             'token': sen_data['words']
                         }
                         self.all_ins_for_every_sen[sen_data['id']].append(node)
-            print(self.all_ins_for_every_sen[sen_data['id']])
+            # print(self.all_ins_for_every_sen[sen_data['id']])
 
         # 这里不是全连接，而是对于所有出现的（实体名对）（类型对）有没有出现过。
         # 首先先去针对原始训练数据构造组合
@@ -111,13 +117,13 @@ class ModelRunner:
             self.entity_begin_type_dict[name1].append(type2)
             self.entity_end_type_dict[name2].append(type1)
             self.ins_pair_list.append((name1, name2))
-            print((name1, name2))
+            # print((name1, name2))
             if (type1, type2) not in self.type_pair_list:
                 self.type_pair_list.append((type1, type2))
-                print((type1, type2))
+                # print((type1, type2))
 
-        txt = open('tf_ner/tools/raw_data_send_to_nre/rel_smart_ins_pair_no_rel.txt', 'w', encoding='utf-8')
-        print('===================================')
+        txt = open('../../tools/raw_data_send_to_nre/rel_smart_ins_pair_no_rel.txt', 'w', encoding='utf-8')
+        # print('===================================')
         for key, values in self.all_ins_for_every_sen.items():
             for i in range(len(values)):  # i 是头节点
                 for j in range(len(values)):  # j是尾节点
@@ -129,22 +135,22 @@ class ModelRunner:
                     if i == j:
                         continue
                     if (values[i]['name'], values[j]['name']) in self.ins_pair_list:
-                        print('a')
+                        # print('a')
                         pass
                     elif name1 in self.entity_begin_type_dict:  # 如果有a节点
-                        print('b')
+                        # print('b')
                         temp = self.entity_begin_type_dict[name1]  # 那我看b的type是否符合条件
                         if type2 not in temp:  # 不符合跳过b节点，符合那就生成
                             continue
                     elif name2 in self.entity_end_type_dict:  # 如果你b在
-                        print('c')
+                        # print('c')
                         temp = self.entity_end_type_dict[name2]
                         if type1 not in temp:  # 如果我a不属于你要找的头结点的类型，那我就跳过
                             continue
                     else:  # ab都不在，那没有判断依据跳过
-                        print('d')
+                        # print('d')
                         continue
-                    print(values[i]['type'], values[j]['type'])
+                    # print(values[i]['type'], values[j]['type'])
                     rel = {
                         'token': values[i]['token'],
                         'h': {
@@ -179,8 +185,8 @@ class ModelRunner:
         }
         # print(words, preds)
         self.data.append(sen)
-        print('words: {}'.format(' '.join(padded_words)))
-        print('preds: {}'.format(' '.join(padded_preds)))
+        # print('words: {}'.format(' '.join(padded_words)))
+        # print('preds: {}'.format(' '.join(padded_preds)))
 
     @staticmethod
     def predict_input_fn(line):

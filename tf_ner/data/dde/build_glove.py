@@ -9,6 +9,9 @@ __author__ = "Guillaume Genthial"
 
 from pathlib import Path
 import numpy as np
+import csv
+
+not_find = []
 
 
 def build_glove():
@@ -18,9 +21,10 @@ def build_glove():
     size_vocab = len(word_to_idx)
 
     # Array of zeros
-    embeddings = np.zeros((size_vocab, 300))
+    embeddings = np.zeros((size_vocab, 300))  # 默认给全0矩阵
 
     # Get relevant glove vectors
+    # todo 这里其实是可以去显示的
     found = 0
     print('Reading GloVe file (may take a while)')
     with Path('../../tools/raw_data/glove.840B.300d.txt').open(encoding='utf-8') as f:  # 这个文件可以从readme中看到，需要单独下载
@@ -36,6 +40,17 @@ def build_glove():
                 found += 1
                 word_idx = word_to_idx[word]
                 embeddings[word_idx] = embedding
+
+    # for key, value in word_to_idx.items():
+    #     if np.count_nonzero(embeddings[value]) == 0:
+    #         not_find.append({'单词': key})
+    #         print(key, '@@@')
+
+    # headers = ['单词']
+    # with open('./can_not_find_embedding.csv', 'w', encoding='utf-8', newline='') as f:
+    #     f_csv = csv.DictWriter(f, headers)
+    #     f_csv.writeheader()
+    #     f_csv.writerows(not_find)
     print('- done. Found {} vectors for {} words'.format(found, size_vocab))
 
     # Save np.array to file

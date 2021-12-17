@@ -18,6 +18,7 @@ class DataDivider:
 
         can_not_use = 0
         counter = 0
+        line = 0
         while True:
             words_line = words_file.readline()
             tags_line = tags_file.readline()
@@ -30,8 +31,10 @@ class DataDivider:
             else:
                 counter = (counter + 1) % wide
                 if counter != 0:
-                    train_words_file.write(words_line)
-                    train_tags_file.write(tags_line)
+                    if line < 20000000:
+                        train_words_file.write(words_line)
+                        train_tags_file.write(tags_line)
+                        line += 1
                 else:
                     test_a_words_file.write(words_line)
                     test_a_tags_file.write(tags_line)
@@ -42,3 +45,7 @@ class DataDivider:
         test_a_words_file.close()
         train_words_file.close()
         train_tags_file.close()
+
+
+if __name__ == '__main__':
+    DataDivider.divide_ins_data(9)
