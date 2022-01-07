@@ -31,7 +31,7 @@ class DataDivider:
             else:
                 counter = (counter + 1) % wide
                 if counter != 0:
-                    if line < 20000000:
+                    if line < 7000:
                         train_words_file.write(words_line)
                         train_tags_file.write(tags_line)
                         line += 1
